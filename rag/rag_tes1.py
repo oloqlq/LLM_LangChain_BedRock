@@ -26,4 +26,4 @@ vector_db = FAISS.from_texts(data, tokenizer)
 
 docs = vector_db.similarity_search("버거킹의 대표 메뉴는?")
 
-print(docs)
+print(docs[0].page_content)
