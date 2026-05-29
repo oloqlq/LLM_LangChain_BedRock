@@ -5,9 +5,17 @@
 #-------------------------------------
 
 import streamlit as st
+import requests as req
 
 #-------------------------------------
-# 2. 
+# 2. 환경변수 / 상수
+#-------------------------------------
+API_URL = 'http://localhost:8000/chat'
+
+
+
+#-------------------------------------
+# 
 #-------------------------------------
 st.set_page_config(page_title='식사 메뉴 해결사')
 st.title('AI 식사 메뉴 해결사 -KING')
@@ -42,10 +50,23 @@ if prompt := st.chat_input('현재 상황을 자세하게 입력하세요.'):
         msg_holder.markdown( '심각한 고민중 -,.-^..' )
 
 
-#-------------------------------------
-# 
-#-------------------------------------
+    result = None
+    try:
+        res = req.post(API_URL, json={"query":prompt})
+        if res.status_code == 200:
+            result = res.json()
+        else:
+            result = f'서버 오류:{res.status_code}'          
+    except Exception as e:
+        print(e)
+        result = f'오류{e}'
+    
+    msg_holder.markdown(result)
 
+    st.session_state.messages.append({
+        'role':'assistant',
+        'content':result
+    })
 
 #-------------------------------------
 # 
