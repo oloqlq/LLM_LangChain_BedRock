@@ -22,9 +22,10 @@ A2A<br>
 `LLM 모델`
 - claude, openai, google 등
 
-`웹 프론트 (챗봇)`
+`웹 프론트`
 - streamlit 활용
 - 파이썬으로만 구성 (html, css, js, x)
+- 챗봇 스타일
 
 `백엔드`
 - api 담당 -> BedRock과 통신 역할 (fastapi 구성)
@@ -50,5 +51,30 @@ python -m venv llm_venv
 
 #맥
 source llm_venv/bin/activate
+```
+
+> .gitignore 
+```
+...
+#가상환경제외
+llm_venv
+```
+
+> 패키지 설치
+```
+   (llm_venv) > pip install -r requirements.txt
+```
+
+
+> requirements.txt
+```
+fastapi # 백엔드 구성, bedrock 호출
+uvicorn # fastapi 구동
+streamlit # 프론트 구성
+requests # 프론트 -> 백엔드 요청
+boto3 # AWWS SDK
+langchain-aws # AWS 전용 랭체인
+langchain-core # 랭체인 코어 라이브러리
+python-dotenv # 환경변수, .env 로드
 ```
 
