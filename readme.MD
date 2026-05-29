@@ -40,24 +40,24 @@ A2A<br>
 > 가상환경 구축
 
 ```
-python -m venv llm_venv
+    python -m venv llm_venv
 ```
 
 > 활성화
 
 ```
-#윈도우
-.\llm_venv\Scripts\activate
+    #윈도우
+    .\llm_venv\Scripts\activate
 
-#맥
-source llm_venv/bin/activate
+    #맥
+    source llm_venv/bin/activate
 ```
 
 > .gitignore 
 ```
-...
-#가상환경제외
-llm_venv
+    ...
+    #가상환경제외
+    llm_venv
 ```
 
 > 패키지 설치
@@ -68,14 +68,14 @@ llm_venv
 
 > requirements.txt
 ```
-fastapi # 백엔드 구성, bedrock 호출
-uvicorn # fastapi 구동
-streamlit # 프론트 구성
-requests # 프론트 -> 백엔드 요청
-boto3 # AWWS SDK
-langchain-aws # AWS 전용 랭체인
-langchain-core # 랭체인 코어 라이브러리
-python-dotenv # 환경변수, .env 로드
+    fastapi         # 백엔드 구성, bedrock 호출
+    uvicorn         # fastapi 구동
+    streamlit       # 프론트 구성
+    requests        # 프론트 -> 백엔드 요청
+    boto3           # AWWS SDK
+    langchain-aws   # AWS 전용 랭체인
+    langchain-core  # 랭체인 코어 라이브러리
+    python-dotenv   # 환경변수, .env 로드
 ```
 
 
@@ -83,16 +83,16 @@ python-dotenv # 환경변수, .env 로드
 > .env
 
 ```
-AWS_REGION
-MODEL_ID
-AWS_BEDROCK_CLAUDE_API_KEY
+    AWS_REGION
+    MODEL_ID
+    AWS_BEDROCK_CLAUDE_API_KEY
 ```
 
 
 # 구동
 > 백엔드 : server.py
 ```
-uvicorn server:app --reload --port 8000
+    uvicorn server:app --reload --port 8000
 ```
 - 테스트
     - http://127.0.0.1:8000/chat

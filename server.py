@@ -16,7 +16,8 @@
 #-------------------------------------
 
 from fastapi import FastAPI
-
+from pydantic import BaseModel
+import llm
 
 
 
@@ -27,8 +28,16 @@ app = FastAPI(title='식사 메뉴 추천 AI')
 
 
 #-------------------------------------
-# 3. API 구성
+# 3. 요청 데이터 구조 정의
+#-------------------------------------
+class UserRequest(BaseModel):
+    query:str
+
+#-------------------------------------
+# 4. API 구성
 #-------------------------------------
 @app.post('/chat')
-async def chat():
-    return "김치볶음밥"
+async def chat(req:UserRequest):
+    # LLM 호출
+
+    return f"돈까스 {req.query}"
