@@ -207,4 +207,4 @@ marimo/_lsp/
 __marimo__/
 
 # 가상환경제외
-llm_venv.env
+llm_venv
