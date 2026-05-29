@@ -17,8 +17,7 @@
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-import llm
-
+from llm import chain
 
 
 #-------------------------------------
@@ -39,5 +38,9 @@ class UserRequest(BaseModel):
 @app.post('/chat')
 async def chat(req:UserRequest):
     # LLM 호출
+    try:
+        response = chain.invoke( {"user_input":req.query})
+        return {"response":response.content}
+    except Exception as e:
+        return {"response": f"에러 {e}"}
 
-    return f"돈까스 {req.query}"
