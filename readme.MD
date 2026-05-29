@@ -78,3 +78,24 @@ langchain-core # 랭체인 코어 라이브러리
 python-dotenv # 환경변수, .env 로드
 ```
 
+
+# 환경변수
+> .env
+
+```
+AWS_REGION
+MODEL_ID
+AWS_BEDROCK_CLAUDE_API_KEY
+```
+
+
+# 구동
+> 백엔드 : server.py
+```
+uvicorn server:app --reload --port 8000
+```
+- 테스트
+    - http://127.0.0.1:8000/chat
+    - post 방식 요청
+
+> 프론트 : app.py
