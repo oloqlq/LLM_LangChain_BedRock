@@ -34,3 +34,8 @@ def search_stores(query: str, k:int=2):
     docs = vector_db.similarity_search(query, k)
     print(f'=== [RAG] 검색 결과 : {docs}')
     return "\n".join([doc.page_content for doc in docs])
+
+
+# 단위테스트
+if __name__ == '__main__':
+    print('유사도기반검색', search_stores("가벼운 식사"))

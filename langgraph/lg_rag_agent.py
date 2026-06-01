@@ -19,18 +19,49 @@ import os
 import boto3
 
 from tools import rag_search
-print(rag_search)
 # 환경변수 호출
-
-#---------------------------------------
-# 
-#---------------------------------------
-
+load_dotenv()
 
 
 #---------------------------------------
-# 
+# LLM 모델 구성
 #---------------------------------------
+llm = ChatBedrockConverse(model       = os.getenv('MODEL_ID'), 
+                          max_tokens  = 1000,
+                          temperature = 0.5,
+                          region_name = os.getnv('AWS_REGION'))
+
+tools = [rag_search]
+llm_with_tools = llm.bind_tools(tools)
+
+#---------------------------------------
+# Few-Shot 프롬프트 구성
+#---------------------------------------
+
+examples        = [
+    {"input":"비 오는 날엔 국물이 땡겨", "output":"국룰이죠. 칼국수나 잔치국수가 좋습니다."},
+    {"input":"다이어트를 위해서 칼로리가 낮은 메뉴로", "output":"관리하시는군요. 닭가슴살 샐러드 드세요."}
+]
+
+example_prompt  = ChatPromptTemplate.from_messages(
+    ('human', '{input}'),
+    ('ai', {'output'}),
+)
+
+few_shot_prompt = FewShotChatMessagePromptTemplate(
+    examples = examples,
+    example_prompt = example_prompt
+)
+
+final_prompt    = ChatPromptTemplate.from_messages([
+    # 1. Persona
+    ('system', '당신은 센스있는 식사 메뉴 추천 전문가입니다. 사용자의 상황에 맞춰서 메뉴룰 추천하고 필요하면 도구를 사용하여 실제 식당을 찾으세요.'), 
+    # 2. Few-Shot Sample
+    few_shot_prompt
+    # 3. User Question
+    ('human', '{messages}')
+])
+
 
 
 
