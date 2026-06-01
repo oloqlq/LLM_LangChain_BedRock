@@ -55,11 +55,26 @@ workflow.add_node("T2", add_suffix)
 
 # 3. 시작점 설정
 workflow.set_entry_point("T1") 
+
+# 4. 작업 순서 지정
 workflow.add_edge('T1', 'T2')
 
-# 4. 끝 점 설정
+# 5. 끝 점 설정
 workflow.add_edge('T2', END)
 
-
 #----------------------------------단방향성.
+
+# 6. 컴파일 수행
+app = workflow.compile()
+
+
+#----------------------------------------
+# 실행 - 그래프 호출
+#----------------------------------------
+
+# 데이터 형태 : 공유메모리 참조 구성
+# 데이터 -> 노드 -> 노드 -> END
+res = app.invoke( {"msg": "랭그래프"} )
+
+print(res)
 
