@@ -64,10 +64,37 @@ final_prompt    = ChatPromptTemplate.from_messages([
 
 
 
+#---------------------------------------
+# langgraph 구성 
+#---------------------------------------
 
-#---------------------------------------
-# 
-#---------------------------------------
+class AgentState(TypedDict):
+    messages: List[ BaseMessage ]
+
+
+# 노드 정의
+def thinking_node(state: AgentState ):
+    pass
+def tool_node(state:AgentState):
+    pass
+def final_answer_node(state:AgentState):
+    pass
+
+# langgraph 연결
+workflow = StateGraph(AgentState)
+workflow.add_node('thinking',       thinking_node)
+workflow.add_node('tool',           tool_node)
+workflow.add_node('final_answer',   final_answer_node)
+workflow.set_entry_point(thinking_node) 
+
+def custom_check_tool_node(state:AgentState):
+    pass
+workflow.add_conditional_edges('thinking', custom_check_tool_node)
+workflow.add_edge('tool', 'final_answer')
+workflow.add_edge('final_answer', END)
+
+랭그래프객체 = workflow.compile()
+
 
 
 
