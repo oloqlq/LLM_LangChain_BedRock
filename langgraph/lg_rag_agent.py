@@ -17,8 +17,8 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from dotenv import load_dotenv
 import os
 import boto3
-
 from tools import rag_search
+
 # 환경변수 호출
 load_dotenv()
 
@@ -59,7 +59,7 @@ final_prompt    = ChatPromptTemplate.from_messages([
     # 2. Few-Shot Sample
     few_shot_prompt
     # 3. User Question
-    ('human', '{messages}')
+    ('human', '{query}')
 ])
 
 
@@ -73,16 +73,28 @@ class AgentState(TypedDict):
 
 
 # 노드 정의
-def thinking_node(state: AgentState ):
+def thinking_node( state:AgentState ):
+    msg = state['messages'] 
+    chain    = final_prompt | llm_with_tools
+    res      = chain.invoke( {"query":msg})
+    return {'messages':[ res ]}
+
+def tool_node( state:AgentState ):
     pass
-def tool_node(state:AgentState):
+
+def final_answer_node( state:AgentState ):
+    msg = state['messages']
+    res = llm.invoke( msg ) 
+    return {'messages':[ res ]}
     pass
-def final_answer_node(state:AgentState):
-    pass
+
 
 # langgraph 연결
 workflow = StateGraph(AgentState)
 workflow.add_node('thinking',       thinking_node)
+
+# 조건부 엣지
+'''
 workflow.add_node('tool',           tool_node)
 workflow.add_node('final_answer',   final_answer_node)
 workflow.set_entry_point(thinking_node) 
@@ -92,15 +104,21 @@ def custom_check_tool_node(state:AgentState):
 workflow.add_conditional_edges('thinking', custom_check_tool_node)
 workflow.add_edge('tool', 'final_answer')
 workflow.add_edge('final_answer', END)
-
-랭그래프객체 = workflow.compile()
-
-
-
-
+'''
 
 #---------------------------------------
 # 
 #---------------------------------------
+
+workflow.add_edge("thinking", END)
+랭그래프객체 = workflow.compile()
+
+if __name__ == '__main__':
+    res = 랭그래프객체.invoke( {"messages": "가벼운 식사"} )
+    print( res )
+
+
+
+
 
 
