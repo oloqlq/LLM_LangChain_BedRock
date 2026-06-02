@@ -55,7 +55,7 @@ few_shot_prompt = FewShotChatMessagePromptTemplate(
 
 final_prompt    = ChatPromptTemplate.from_messages([
     # 1. Persona
-    ('system', '당신은 센스있는 식사 메뉴 추천 전문가입니다. 사용자의 상황에 맞춰서 메뉴룰 추천하고 필요하면 도구를 사용하여 실제 식당을 찾으세요.'), 
+    ('system', '당신은 센스있는 식사 메뉴 추천 전문가입니다. 반드시 도구를 사용하여 실제 식당을 찾으세요.'), 
     # 2. Few-Shot Sample
     few_shot_prompt,
     # 3. User Question

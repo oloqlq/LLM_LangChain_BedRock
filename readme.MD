@@ -193,3 +193,40 @@ LLM이 훈련하지 않은 최신 정보나, 기업 내부 데이터에 대해�
     langgraph
     pip install -r requirements.txt
 ```
+
+
+<br>
+<br>
+<br>
+
+# A2A Architecture
+
+> Agent-to-Agent<br>
+
+LLM이 처음부터 끝까지 처리하는 것이 아닌 작업도 있다.<br>
+전문화된 페르소나를 가진 에이전트들이 서로 결과물을 입력받아서 작업을 고도화하는 방식<br>
+
+
+`User Task` : 사용자가 주제를 던진다<br>
+`Agent A (Developer)` : 요청을 받아서 1차 코드 작성<br>
+`Agent B (Reviewer)` : 1차 코드를 받아서 체크 리뷰, 수정<br>
+`Feedback Loop` : Agent A는 Agent B의 리뷰를 바탕으로 코드를 수정 -> 반복<br>
+
+<br>
+
+
+> 구성<br>
+
+A2A_langchain<br>
+A2A_langgraph
+
+<br>
+
+> 특징<br>
+1. **다른 에이전트의 출력은 또 다른 에이전트의 입력.**
+2. **피드백 루프** : 일을 지시하고 마무리되는 것이 아니라, 리뷰 결과에 따라 행동 결정
+    - 카운트를 부여해서 반복 횟수를 지정할 수도 있다.
+3. **순차적 협업 패턴** : 에이전트 정의
+    - Developer Agent : 구현에 집중하는 프롬프트
+    - Reviewer Agent : 비판, 분석, 평가에 집중하는 프롬프트
+
