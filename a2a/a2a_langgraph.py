@@ -21,7 +21,7 @@
 # 1. 모듈가져오기
 import boto3
 from langchain_aws import ChatBedrock
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 from langgraph.graph import StateGraph, END
@@ -56,8 +56,8 @@ def coder_node(state:AgentState ):
     # 프럼프트 구성
     coder_prompt = ChatPromptTemplate.from_messages([
         ('system',      '당신은 "초보 파이썬 개발자"입니다. 요청받은 기능을 구현하는 코드를 작성하세요. 리뷰어의 피드백이 있다면 그것을 반영하여 코드를 수정하시오'),
-        # 해당 메세제가. HumanMessage, AIMessage, SystemMessage or  형태를 잘 모르겠다 => 알아서 세팅 placeHolder
-        ('placeHolder', '{messages}'),
+        # 기존 대화 메시지를 그대로 프롬프트에 삽입
+        MessagesPlaceholder(variable_name='messages'),
     ])
     # 랭체인 구성 (프럼프트=>llm) -> 에이전트 실체
     chain = coder_prompt | llm
