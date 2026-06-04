@@ -48,6 +48,7 @@ note_memory = dict()
 #--------------------------------
 # 외부 리소스
 # 간단한 기능 구현 (6개)
+@mcp.tool()
 def add(a:float, b:float) -> str:
     '''
     두 수를 더하는 계산기
@@ -62,6 +63,7 @@ def add(a:float, b:float) -> str:
     logger.info(f'Tool 1 add 호출: {a} + {b} = {result}')
     return f'계산 결과 : {a}+{b}={result}'
 
+@mcp.tool()
 def get_time() -> str:
     '''
     서버 측 현재 시간 조회
@@ -75,6 +77,7 @@ def get_time() -> str:
 
 # CRUD 도구
 ## Tool 3 : save_note 메모 저장/업데이트
+@mcp.tool()
 def save_note(note_id: str, note_content: str) -> str:
     '''
     메모 저장
@@ -102,6 +105,7 @@ def save_note(note_id: str, note_content: str) -> str:
     pass
 
 ## Tool 4 : list_note 메모 목록 조회
+@mcp.tool()
 def list_note() -> str:
     '''
     저장된 모든 메모 목록 조회
@@ -121,6 +125,7 @@ def list_note() -> str:
     return f'저장된 모든 메모:\n{notes}'
 
 ## Tool 5 : delete_note 메모 삭제
+@mcp.tool()
 def delete_note(note_id: str) -> str:
     '''
     특정 메모 삭제
