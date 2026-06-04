@@ -250,3 +250,37 @@ A2A_langgraph
 - LLM 활용에 대한 시간/비용적 비효율성을 개선하고자 한번만 구현하면 어떤 앱이든 플러그인 형태로 바로 연결되도록 고안.
 
 
+> 전체 아키텍처 <br>
+
+```
+1. 사용자 > 프롬프트 > 랭체인/랭그래프 > LLM 판단 > tool 사용 필요 시 선택
+2. 외부 도구 > Adapter > MCP Server > 비즈니스 로직
+3. 응답 > MCP Client 응답 > LLM 응답 > 다음 노드 진행
+```
+
+
+> 구현 <br>
+
+>> 1단계 심플 구성><br
+>
+`통신 집중`
+
+MCP Client < - > MCP Server
+
+<br>
+
+
+`필요 패키지 추가 설치`
+```
+# requirements.txt
+mcp==1.27.2
+botocore
+langsmith
+pydantic
+```
+```
+pip install -r requirements.txt
+```
+
+
+
