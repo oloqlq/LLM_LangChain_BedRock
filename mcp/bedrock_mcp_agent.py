@@ -40,9 +40,21 @@ class BedrockMCPAgent:
 
     # 초기화
     async def initialize(self):
+        # MCP Tool 로드
+        print(f'MCP Server와 연결 중...')
+        # mcp_tools_adapter.py와 작업 기술
 
+        # LLM 생성
+        print(f'LLM 초기화 중..')
         self._init_llm()
-        pass
+
+        # 랭그래프 기반 에이전트 구성
+        print(f'langgraph agent 구성 중..')
+        self._setup_graph()
+
+        print(f'초기화 완료\n 프롬프트 입력 대기..')
+        return self
+    
     
     # LLM 생성
     async def _init_llm():
@@ -61,12 +73,38 @@ class BedrockMCPAgent:
             pass
         pass
 
-
-
     # 그래프 구성
+    def _setup_graph(self):
+        llm_with_tools = self.llm.bind_tools(self.tools)
+        workflow = StateGraph(MessagesState)
+        def call_agent(state:MessagesState) -> dict:
+            '''LLM 호출하여 Tool 선택, 응답 생성'''
+            pass
+        tool_node = ToolNode(self.tools)
+        workflow.add_node('agent', call_agent)
+        workflow.add_node('tools', tool_node)
+
+        workflow.set_entry_point('agent')
+        
+        def 조건부함수() -> str:
+            '''tool_calls 값 체크, 판단'''
+            pass
+
+        workflow.add_conditional_edges(
+            'agent',
+            조건부함수,
+            {
+                "tools" : 'tools',
+                "end"   : END
+            }
+        )
+        workflow.add_edge('tools', 'agent')
+        self.graph = workflow.compile()
+
+        pass
+
     # 사용자 요청 처리
     # 메모리 정리
-
     pass
 
 
