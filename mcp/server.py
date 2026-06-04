@@ -43,14 +43,11 @@ logger.info('MCPServer 구성(초기화) 중 ...')
 #--------------------------------
 note_memory = dict()
 
-
-
 #--------------------------------
 # Tool 구현 
 #--------------------------------
 # 외부 리소스
 # 간단한 기능 구현 (6개)
-
 def add(a:float, b:float) -> str:
     '''
     두 수를 더하는 계산기
@@ -65,6 +62,94 @@ def add(a:float, b:float) -> str:
     logger.info(f'Tool 1 add 호출: {a} + {b} = {result}')
     return f'계산 결과 : {a}+{b}={result}'
 
+def get_time() -> str:
+    '''
+    서버 측 현재 시간 조회
+
+    Returns 
+        현재 시간 문자열
+    '''
+    cur_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.info(f'Tool 2 get_time 호출: {cur_time}')
+    return f'현재 시간 : {cur_time}'
+
+# CRUD 도구
+## Tool 3 : save_note 메모 저장/업데이트
+def save_note(note_id: str, note_content: str) -> str:
+    '''
+    메모 저장
+
+    Args:
+        note_id: 메모의 고유 ID, 키값
+        note_content: 메모 내용
+
+    Returns
+        저장 완료 메세지
+    '''
+    # 방어코드
+    if not note_id or not note_content: # 내용 혹은 아이디가 누락되면
+        logger.warning('필수 파라미터 누락')
+        return "Fail: 필수 파라미터 누락"
+    # 저장처리
+    note_memory[note_id] = {
+        "content"    : note_content,
+        "created_at" : datetime.now().isoformat()
+    }
+    # 로깅
+    logger.info(f"save_note 호출: note_id={note_id}")
+    # 반환
+    return f"메모 저장 완료 {note_id}"
+    pass
+
+## Tool 4 : list_note 메모 목록 조회
+def list_note() -> str:
+    '''
+    저장된 모든 메모 목록 조회
+
+    Returns
+        저장된 모든 메모
+    '''
+    if not note_memory:
+        logger.info(f"list_note 호출: 저장된 메모 없음")
+        return "저장된 메모 없음"
+
+    # 존재하면 => 하나의 말뭉치로 구성 반한 (컨셉)
+    notes = "\n".join([
+        f'- id: {note_id},  content: {value["content"]}'
+        for note_id, value in note_memory.items()
+    ])
+    return f'저장된 모든 메모:\n{notes}'
+
+## Tool 5 : delete_note 메모 삭제
+def delete_note(note_id: str) -> str:
+    '''
+    특정 메모 삭제
+
+    Args:
+        note_id: 메모의 고유 ID, 키값
+
+    Returns
+        현재 시간 문자열
+    '''
+    # 실습 -> 삭제는 del 사용
+    if note_id in note_memory:
+        del note_memory[ note_id ]
+        logger.info(f'delete_note 호출: note_id={note_id}')
+        return f'메모 삭제 완료! {note_id}'
+    else:
+        logger.info(f'delete_note 실패: note_id={note_id}로 구분되는 메모가 없음')
+        return f'메모 삭제 실패! {note_id}로 구분되는 메모가 없음'
+    pass
+
+# Tool 6 : rag_search 검색증강
+
+
+
 #--------------------------------
 # 서버 가동
 #--------------------------------
+if __name__ == '__main__':
+    logger.info('MCPServer 가동 중 ...')
+    logger.info('STDIO 모드로 가동 중 ...')
+    
+    mcp.run(transport="stdio")
