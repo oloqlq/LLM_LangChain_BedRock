@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+streamlit
+requests
+boto3
+langchain-aws
+langchain-core
+python-dotenv
+langchain-community
+faiss-cpu
+langchain
+langgraph
+mcp==1.27.2
+botocore
+langsmith
+pydantic
+
