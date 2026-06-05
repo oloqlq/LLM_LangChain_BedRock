@@ -16,7 +16,7 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import StateGraph, END, MessagesState
 from langgraph.prebuilt import ToolNode
 
-from mcp_tools_adapter import MCPClient
+from mcp_tools_adapter import MCPToolAdapter
 
 # 2. 환경변수 로드
 load_dotenv()
@@ -32,16 +32,20 @@ class BedrockMCPAgent:
         self.graph = None  # Langgraph workflow # LLM, 도구등 배치하는 그래프 
         self.mcp_adpater = None # mcp_tools_adapter내 객체와 MCP 서버와 연동
 
-
     # 초기화
     async def initialize( self ):
         # MCP Tool 로드
         print(f'MCP Server와 연결중..')
         # mcp_tools_adapter.py와 작업 기술
+        self.mcp_adpater = MCPToolAdapter(self.server_script)
+        await self.mcp_adpater.initialize()
+        # MCP 도구 => 랭체인 도구 매핑(StructuredTool:구조화된도구) => 전체 목록 반환
+        self.tools = self.mcp_adpater.create_langchain_tools()
+        print(f'도구 { len(self.tools) }개 로드 완료')
 
         # LLM 생성
         print(f'LLM 초기화 중..')
-        self._init_llm()
+        await self._init_llm()
 
         # langgraph 기반 에이전트 구성
         print(f'langgraph agent 구성 중..')
@@ -120,42 +124,53 @@ class BedrockMCPAgent:
     
     # 사용자 요청 처리(프럼프트 처리)
     async def process_query(self, user_input:str) -> str:
-        print(f'\n사용자 입력: {user_input}\n')
-        messages = [HumanMessage(content=user_input)]
+        print(f'\n사용자 입력 : {user_input}\n')
+        # 1. 메세지 구성
+        messages = [ HumanMessage(content=user_input)]
+        # 2. 메세지 전달하여 그래프 실행
         try:
-            result = self.graph.invoke({"messages":messages})
+            # 그래프 실행
+            result   = self.graph.invoke({"messages":messages})
+            # 최종 메세지 추출 
             last_msg = result['messages'][-1]
             if hasattr(last_msg, 'content'):
                 res = last_msg.content
             else:
                 res = str(last_msg)
-            print( f'\n 에이전트 응답 {res}')
+            print( f'\n 에이전트 응답 { res }')
             return res
-
         except Exception as e:
-            msg = f'\n메세지 처리중 에러 발생 {e}'
-            print(f'\n메세지 처리 중 에러 발생 {e}')
-            print(msg)
+            msg = f'\n 메세지 처리중 에러 발생 {e}'
+            print( msg )
             return msg
 
     # 메모리 정리(뒷정리)
+    async def cleanup(self):
+        '''뒷정리'''
+        if self.mcp_adpater:
+            await self.mcp_adpater.cleanup()
     pass
 
 # 4. 메인함수
 async def main():
     # BedrockMCPAgent 에이전트 생성
-    agent = BedrockMCPAgent()
-    try:
-        agent.initialize()
-        # 사용자 입력 대기(프럼프트 입력 대기) -> 무한루프? 1회성?
-        query = input('\n프롬프트 입력: ').stirp()
-        # BedrockMCPAgent 에이전트의 `사용자 요청 처리` 함수 호출
-        if query:
-            await agent.process_query(query)
-    except Exception as e:
-        print('main() 오류 발생 {e}')
+    agent = BedrockMCPAgent() # 기본값 생성
+    await agent.initialize()
+    while True:
+        try: 
+            # MCP 서버 연동 -> I/O -> 예외상황             
+            # 사용자 입력 대기(프럼프트 입력 대기) -> 무한루프? 1회성?
+            query = input('\n프럼프트 입력: ').strip()
+            if query == 'q': break
+            # BedrockMCPAgent 에이전트의 `사용자 요청 처리` 함수 호출
+            if query:
+                await agent.process_query( query )
+        except Exception as e:
+            print(f'main() 오류 발생 {e}')
+    #finally:
+    # 뒷정리
+    await agent.cleanup() # MCP 서버와 연결된 세션, 스트림 모두 해제 (컨셉)
     pass
-
 
 # 5. 서비스가동
 if __name__ == '__main__':    

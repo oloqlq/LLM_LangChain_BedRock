@@ -208,3 +208,4 @@ __marimo__/
 
 # 가상환경제외
 llm_venv
+replacements.txt
