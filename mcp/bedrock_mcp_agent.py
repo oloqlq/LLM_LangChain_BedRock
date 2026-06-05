@@ -144,9 +144,18 @@ class BedrockMCPAgent:
 # 4. 메인함수
 async def main():
     # BedrockMCPAgent 에이전트 생성
-    # 사용자 입력 대기(프럼프트 입력 대기) -> 무한루프? 1회성?
-    # BedrockMCPAgent 에이전트의 `사용자 요청 처리` 함수 호출
+    agent = BedrockMCPAgent()
+    try:
+        agent.initialize()
+        # 사용자 입력 대기(프럼프트 입력 대기) -> 무한루프? 1회성?
+        query = input('\n프롬프트 입력: ').stirp()
+        # BedrockMCPAgent 에이전트의 `사용자 요청 처리` 함수 호출
+        if query:
+            await agent.process_query(query)
+    except Exception as e:
+        print('main() 오류 발생 {e}')
     pass
+
 
 # 5. 서비스가동
 if __name__ == '__main__':    
