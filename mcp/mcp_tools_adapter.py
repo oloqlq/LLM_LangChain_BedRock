@@ -1,6 +1,7 @@
 '''
 MCP Server 와 통신
-MCP에서 정의한 Tool을 Langchain/Langgraph용 Tool로 변환 처리
+MCP에서 정의한 Tool을 Langchain/Langgraph 용 Tool로 변환 처리
+LLM이 해당 도구에 대한 이해와 ,사용 판단에 정확한 정보를 제공
 '''
 # 1. 모듈 가져오기
 import asyncio
@@ -11,25 +12,57 @@ from mcp.client.stdio import stdio_client # 입력, 출력을 가진 클라이�
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field, create_model
 
-# 2. MCPClient 클레스 구성
+# 2. MCPToolAdapter
 class MCPToolAdapter:
-    '''MCP Server와 통신하는 클레스(역활:클라이언트)'''
+    '''MCP Server와 통신. LangChain/LangGraph Tool로 변환 제공'''
     # 생성자
     def __init__(self, server_script: str = 'server.py'):
-        '''
-        Args:
-            server_script: 실행할 Server측 스크립트 경로
-        '''
         self.server_script  = server_script
-        self.mcp_tools      = []   # mcp tool
-        self.tools          = []   # langchain/langgraph tool
-        self.read_stream    = None # 입력 스트림
-        self.write_strema   = None # 출력 스트림
-        self.session: Optional[ClientSession] = None
-        self._stdio_context = None
+        self.mcp_tools      = []   #  mcp Tool
+        self.tools          = []   #  LangChain/LangGraph Tool
+        self.read_stream    = None # 입력 스트림 -> 여러 함수에서 사용하겠다.
+        self.write_stream   = None # 출력 스트림 -> 여러 함수에서 사용하겠다.
+        self.session: Optional[ClientSession] = None # 세션 맴버변수 -> 여러 함수에서 사용하겠다.
+        self._stdio_context = None # 입출력에 관련한 내부적 프로레스 접근을 위한 컨텍스트 
+        pass
+    
+    # 초기화
+    async def initialize( self ):
+        '''MCP Server 연결, Tool 로드'''
+        # MCP Server 접속시 필요한 정보 세팅
+        server_params = StdioServerParameters(
+            command = sys.executable,
+            args    = [self.server_script],
+            env     = None
+        )
+        # 메세지가 오염되면 => 출력을 sys.stderr
+        print('MCP 서버 연결중..')
+        try:
+            self._stdio_context = stdio_client(server_params)
+            stdio_tuple = await self._stdio_context.__aenter__()
+            if isinstance( stdio_tuple, tuple):
+                self.read_stream, self.write_stream = stdio_tuple
+            else:
+                self.read_stream    = stdio_tuple
+                self.write_stream   = stdio_tuple
+            
+        except Exception as e:
+            print('MCP 서버 연결 실패', e)
+            raise
+        pass
+    
+    async def cleanup(self):
+        '''입/출력 스트림, 세션 등 자원 해제'''
+        try:
+            if self._stdio_context:
+                await self._stdio_context.__aexit__(None, None, None)
+        except Exception as e:
+            print('입/출력 스트림 종료 에러', e)
         pass
 
 
-# 4. 비동기 함수 호출 -> MCP 서버 연동
+
+
+# 4. 테스트
 if __name__ == '__main__':
     pass
